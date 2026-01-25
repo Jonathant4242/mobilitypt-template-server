@@ -104,4 +104,3 @@ This networking project is the foundation for a larger Cancellation Gap Filler A
 - The filled message is generated and placed in a text box for copying into a texting system (ex: Google Voice).
 
 In later phases, this service can be integrated into a GUI and extended to support scheduling data (like cancellations and openings) while keeping messaging logic reusable and consistent.
-EOF
