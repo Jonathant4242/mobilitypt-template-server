@@ -1,0 +1,42 @@
+{Button} = New Patient
+Hi, this is Mobility Physical Therapy. We received an authorization from your doctor to begin treatment.
+
+Our Address: 3002 Dow Ave, Suite 318, Tustin, CA 92780
+
+Please give us a call at (714) 389-9306. Have a great day! If you reply via text, please include your contact information: First Name and Last Name.
+---
+
+{Button} = Checking In (Non-Active Patients)
+Hello,
+This is Mobility Physical Therapy, Inc. We wanted to reach out and let you know that your approval for additional physical therapy is still valid. If you would like to schedule an appointment, please feel free to call us at (714) 389-9306.
+Thank you!
+---
+
+{Button} = Eval Scheduled
+Hi, this is Mobility Physical Therapy. You are scheduled for {DAY}, {DATE} at {TIME}.
+
+Please arrive 15 minutes early to complete the paperwork. Bring your insurance card I.D., and any imaging reports. If you need to cancel or reschedule, please CALL us 24 hours before your appointment time at (714) 389-9306.
+
+Our Address: 3002 Dow Ave, Suite 318, Tustin, CA 92780
+
+If you would like to download and fill out our new patient form, please use this link:
+https://mobilitypt.net/new-patients-center/
+
+Please respond to this message. Please confirm the appointment (C) or CALL to cancel. Leave a voicemail if you can’t reach us.
+---
+
+{Button} = Follow-Up Visit
+Hello, this is Mobility Physical Therapy. This is a reminder for your upcoming appointment.
+
+Date: {DATE}
+Time: {TIME}
+
+If you need to cancel:
+PLEASE call and leave a voicemail at (714) 389-9306 at least 24 hours before your appointment as per our cancellation policy.
+---
+
+{Button} = Accidental Lake Forest Phone Call
+Hello, this is Mobility Physical Therapy. Please call back this phone number to reach the Lake Forest Office. Thank you, have a great rest of your day!
+
+(949) 540-0301
+---
