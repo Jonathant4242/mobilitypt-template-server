@@ -94,13 +94,6 @@ Obtain information from a local file
 
 - The server loads templates from `templates.txt`.
 
-## Demo plan (recording flow)
-
-1. Start the server (`python3 server.py`)
-2. Run `python3 client.py list` (shows template titles)
-3. Run `python3 client.py get "{Button} = Follow-Up Visit"` (shows template body with placeholders)
-4. Run `python3 client.py render "{Button} = Eval Scheduled" DAY=MON DATE=1/26/26 TIME="4:00 PM"` (shows filled output)
-5. Run the client again to show reconnect works (`python3 client.py list`)
 
 ## How this is a foundation for my overall project
 
