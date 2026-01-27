@@ -1,3 +1,6 @@
+#Walk through my code by me, John T.
+https://www.loom.com/share/da2ac158f0894ccea4e12c9a8be65256
+
 # mobilitypt-template-server
 
 TCP client-server project for the CSE 310 Networking module. The server provides reusable text message templates to clients over a local network (LAN) using one-line JSON messages.
