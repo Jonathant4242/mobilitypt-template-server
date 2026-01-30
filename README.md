@@ -1,3 +1,7 @@
+# Walk through my code by me, John T.
+
+https://www.loom.com/share/da2ac158f0894ccea4e12c9a8be65256
+
 # mobilitypt-template-server
 
 TCP client-server project for the CSE 310 Networking module. The server provides reusable text message templates to clients over a local network (LAN) using one-line JSON messages.
@@ -94,13 +98,6 @@ Obtain information from a local file
 
 - The server loads templates from `templates.txt`.
 
-## Demo plan (recording flow)
-
-1. Start the server (`python3 server.py`)
-2. Run `python3 client.py list` (shows template titles)
-3. Run `python3 client.py get "{Button} = Follow-Up Visit"` (shows template body with placeholders)
-4. Run `python3 client.py render "{Button} = Eval Scheduled" DAY=MON DATE=1/26/26 TIME="4:00 PM"` (shows filled output)
-5. Run the client again to show reconnect works (`python3 client.py list`)
 
 ## How this is a foundation for my overall project
 
@@ -111,4 +108,3 @@ This networking project is the foundation for a larger Cancellation Gap Filler A
 - The filled message is generated and placed in a text box for copying into a texting system (ex: Google Voice).
 
 In later phases, this service can be integrated into a GUI and extended to support scheduling data (like cancellations and openings) while keeping messaging logic reusable and consistent.
-EOF
