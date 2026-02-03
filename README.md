@@ -98,7 +98,6 @@ Obtain information from a local file
 
 - The server loads templates from `templates.txt`.
 
-
 ## How this is a foundation for my overall project
 
 This networking project is the foundation for a larger Cancellation Gap Filler Assistant workflow:
