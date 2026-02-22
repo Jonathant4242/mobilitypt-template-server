@@ -12,11 +12,12 @@
             {% for block in blocks %}
                 <li>
                     <strong>{{ block.title }}</strong>
-                    <pre style="white-space: pre-wrap;">
-{{ block.body }}
-                    </pre>
+                    <pre style="white-space: pre-wrap;">{{ block.body }}</pre>
                 </li>
-                <hr>
+
+                {% if not forloop.last %}
+                    <hr>
+                {% endif %}
             {% endfor %}
         </ul>
     {% else %}

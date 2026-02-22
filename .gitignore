@@ -2,6 +2,19 @@
 __pycache__/
 *.py[cod]
 
+# Django / local dev databases
+*.sqlite3
+*.sqlite3-journal
+
+# Test / type-check caches
+.pytest_cache/
+.mypy_cache/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
 # Virtual environments
 .venv/
 venv/
@@ -12,6 +25,10 @@ env/
 Thumbs.db
 .vscode/
 .idea/
+
+# Environment files
+.env
+.env.*
 
 # Logs
 *.log
