@@ -1,16 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>Django Spike</title>
+    <meta charset="utf-8">
+    <title>Django Templates</title>
 </head>
 <body>
-  <h1>Django spike is alive ✅</h1>
+    <h1>Django spike is alive ✅</h1>
 
-  <ul>
-    {% for button in buttons %}
-      <li>{{ button }}</li>
-    {% endfor %}
-  </ul>
+    {% if blocks %}
+        <ul>
+            {% for block in blocks %}
+                <li>
+                    <strong>{{ block.title }}</strong>
+                    <pre style="white-space: pre-wrap;">
+{{ block.body }}
+                    </pre>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No templates found.</p>
+    {% endif %}
 </body>
 </html>
