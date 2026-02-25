@@ -1,0 +1,93 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mobility PT — Template Generator</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+  <!-- Stretch goal: use a JS library (Day.js) to help parse/format dates -->
+  <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
+  <script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
+
+  <!-- Helpers: build date/time suggestions + auto-fill weekday (ux-lib.js) -->
+  <script defer src="{% static 'ux-lib.js' %}"></script>
+  <script defer src="{% static 'app.js' %}"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Mobility PT — Template Generator</h1>
+    <p class="muted">Select a template, enter any needed fields, and generate a preview.</p>
+
+    <div class="card">
+      <h2 class="section-title">Generate Message</h2>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="row single">
+          <div>
+            <label for="template">Template</label>
+            <select id="template" name="template" required>
+              <option value="">-- Select Template --</option>
+              {% for block in blocks %}
+                <option value="{{ block.title }}" {% if block.title == selected_title %}selected{% endif %}>{{ block.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="spacer spacer-sm" aria-hidden="true"></div>
+
+        <div class="row">
+          <div>
+            <label for="day">Day</label>
+            <input id="day" type="text" name="day" value="{{ day|default:'' }}" placeholder="e.g., Monday" autocomplete="off" />
+          </div>
+          <div>
+            <label for="date">Date</label>
+            <input id="date" type="text" name="date" value="{{ date|default:'' }}" placeholder="e.g., Sun Feb 22, 2026" list="dateOptions" autocomplete="off" />
+            <datalist id="dateOptions"></datalist>
+          </div>
+          <div>
+            <label for="time">Time</label>
+            <input id="time" type="text" name="time" value="{{ time|default:'' }}" placeholder="e.g., 3:30 PM" list="timeOptions" autocomplete="off" />
+            <datalist id="timeOptions"></datalist>
+          </div>
+        </div>
+
+        <div class="spacer spacer-md" aria-hidden="true"></div>
+
+        <button type="submit" class="btn">Generate Preview</button>
+      </form>
+
+      {% if error %}
+        <p class="error">{{ error }}</p>
+      {% endif %}
+
+      {% if generated_message %}
+        <h2 class="section-title">Preview</h2>
+        <pre class="preview">{{ generated_message }}</pre>
+      {% endif %}
+    </div>
+
+    <details>
+      <summary>Show all templates</summary>
+      <div class="card">
+        {% if blocks %}
+          {% for block in blocks %}
+            <h3 class="template-title">{{ block.title }}</h3>
+            <pre class="template-body">{{ block.body }}</pre>
+            {% if not forloop.last %}
+              <hr>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p>No templates found.</p>
+        {% endif %}
+      </div>
+    </details>
+  </div>
+</body>
+</html>
