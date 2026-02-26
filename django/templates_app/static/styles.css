@@ -96,7 +96,7 @@ select,
 input {
   width: 100%;
   padding: var(--space-3);
-  border: 1px solid #bbb;
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font: inherit;
 }
@@ -161,18 +161,6 @@ hr {
   margin: var(--space-6) 0;
 }
 
-/* Small screens */
-@media (max-width: 720px) {
-  body {
-    margin: 16px;
-  }
-
-  .row {
-    grid-template-columns: 1fr;
-  }
-}
-
-
 .row > div {
   display: flex;
   flex-direction: column;
@@ -186,4 +174,15 @@ hr {
 
 .actions button {
   width: 100%;
+}
+
+/* Small screens */
+@media (max-width: 720px) {
+  body {
+    margin: 16px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
 }
