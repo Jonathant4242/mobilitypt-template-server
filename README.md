@@ -45,7 +45,7 @@ Open: `http://127.0.0.1:8000/`
 ### Stretch goal completed (Library)
 
 - A JavaScript library (Day.js) is used client-side to help build date/time suggestions and auto-fill day-of-week.
-- Your scripts are organized as:
+- Scripts are organized as:
   - `django/templates_app/static/ux-lib.js` (helpers)
   - `django/templates_app/static/app.js` (DOM wiring)
 

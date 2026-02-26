@@ -1,5 +1,6 @@
 // ux-lib.js
-// Pure helpers for date/time inputs + datalist building.
+// Helper functions for the Home form (date/time datalists + weekday lookup).
+// Kept separate so app.js stays as "DOM wiring only" (no build step needed).
 // No event listeners here.
 
 (function () {
@@ -7,7 +8,7 @@
 
   const HAS_DAYJS = typeof window.dayjs === "function";
 
-  // If customParseFormat plugin exists, enable it.
+  // Enable customParseFormat if the plugin is loaded (optional).
   if (HAS_DAYJS && window.dayjs_plugin_customParseFormat) {
     window.dayjs.extend(window.dayjs_plugin_customParseFormat);
   }

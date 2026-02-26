@@ -1,5 +1,6 @@
 // app.js
-// DOM wiring only. Uses window.TemplateUX (from ux-lib.js).
+// DOM wiring only (event listeners + initial render).
+// Requires ux-lib.js to load first (window.TemplateUX).
 
 (function () {
   "use strict";
