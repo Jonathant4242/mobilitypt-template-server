@@ -2,7 +2,7 @@
 
 ## Sprint 2 (Web App Framework: Django)
 
-Loom (Sprint 2):
+Loom (Sprint 2): https://www.loom.com/share/4ed9510a2f1d40bebdf6b0cf720603c9
 
 ### What this does
 
