@@ -7,11 +7,11 @@
   <title>Mobility PT — Template Generator</title>
   <link rel="stylesheet" href="{% static 'styles.css' %}">
 
-  <!-- Stretch goal: use a JS library (Day.js) to help parse/format dates -->
+  <!-- I use Day.js here to help parse and format date values. -->
   <script src="https://unpkg.com/dayjs/dayjs.min.js"></script>
   <script src="https://unpkg.com/dayjs/plugin/customParseFormat.js"></script>
 
-  <!-- Helpers: build date/time suggestions + auto-fill weekday (ux-lib.js) -->
+  <!-- I load the shared helpers first, then app.js handles the page behavior. -->
   <script defer src="{% static 'ux-lib.js' %}"></script>
   <script defer src="{% static 'app.js' %}"></script>
 </head>
@@ -28,11 +28,28 @@
 
         <div class="row single">
           <div>
+            <label>Quick Messages (No Fields Required)</label>
+            <div class="button-row quick-buttons">
+              <button type="button" class="btn btn-secondary" data-template="New Patient">New Patient</button>
+              <button type="button" class="btn btn-secondary" data-template="Checking In (Non-Active Patients)">Checking In</button>
+              <button type="button" class="btn btn-secondary" data-template="Accidental Lake Forest Phone Call">Accidental Lake Forest</button>
+              <button type="button" class="btn btn-secondary" data-template="Authorization Received">Authorization Received</button>
+              <button type="button" class="btn btn-secondary" data-template="Return Call Request">Return Call Request</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="spacer spacer-sm" aria-hidden="true"></div>
+
+        <div class="row single">
+          <div>
             <label for="template">Template</label>
             <select id="template" name="template" required>
               <option value="">-- Select Template --</option>
               {% for block in blocks %}
-                <option value="{{ block.title }}" {% if block.title == selected_title %}selected{% endif %}>{{ block.title }}</option>
+                {% if block.title != "New Patient" and block.title != "Checking In (Non-Active Patients)" and block.title != "Accidental Lake Forest Phone Call" and block.title != "Authorization Received" and block.title != "Return Call Request" %}
+                  <option value="{{ block.title }}" {% if block.title == selected_title %}selected{% endif %}>{{ block.title }}</option>
+                {% endif %}
               {% endfor %}
             </select>
           </div>
@@ -43,12 +60,22 @@
         <div class="row">
           <div>
             <label for="day">Day</label>
-            <input id="day" type="text" name="day" value="{{ day|default:'' }}" placeholder="e.g., Monday" autocomplete="off" />
+            <select id="day" name="day">
+              <option value="">-- Select Day --</option>
+              <option value="Sunday" {% if day == "Sunday" %}selected{% endif %}>Sunday</option>
+              <option value="Monday" {% if day == "Monday" %}selected{% endif %}>Monday</option>
+              <option value="Tuesday" {% if day == "Tuesday" %}selected{% endif %}>Tuesday</option>
+              <option value="Wednesday" {% if day == "Wednesday" %}selected{% endif %}>Wednesday</option>
+              <option value="Thursday" {% if day == "Thursday" %}selected{% endif %}>Thursday</option>
+              <option value="Friday" {% if day == "Friday" %}selected{% endif %}>Friday</option>
+              <option value="Saturday" {% if day == "Saturday" %}selected{% endif %}>Saturday</option>
+            </select>
           </div>
           <div>
             <label for="date">Date</label>
-            <input id="date" type="text" name="date" value="{{ date|default:'' }}" placeholder="e.g., Sun Feb 22, 2026" list="dateOptions" autocomplete="off" />
-            <datalist id="dateOptions"></datalist>
+            <select id="date" name="date">
+              <option value="">-- Select Date --</option>
+            </select>
           </div>
           <div>
             <label for="time">Time</label>
@@ -59,7 +86,10 @@
 
         <div class="spacer spacer-md" aria-hidden="true"></div>
 
-        <button type="submit" class="btn">Generate Preview</button>
+        <div class="button-row">
+          <button type="submit" class="btn">Generate Preview</button>
+          <button type="reset" class="btn btn-secondary">Reset</button>
+        </div>
       </form>
 
       {% if error %}
