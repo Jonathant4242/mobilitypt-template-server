@@ -121,5 +121,6 @@
     buildDateOptions,
     buildTimeOptions,
     weekdayFromDate,
+    formatDateValue,
   };
 })();
