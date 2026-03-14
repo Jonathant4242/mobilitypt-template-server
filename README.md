@@ -2,7 +2,7 @@
 
 ## Sprint 3 (Java Module: Request Processing)
 
-Loom (Sprint 3):
+Loom (Sprint 3): https://www.loom.com/share/76c5f7d052cb4aa4ba6843bf803a4989
 
 ### What this does
 
