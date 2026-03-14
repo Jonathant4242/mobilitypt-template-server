@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-
-from django.shortcuts import render
-
 import re
 from typing import Optional
+
+from django.shortcuts import render
 
 
 @dataclass(frozen=True)
@@ -17,8 +16,7 @@ class TemplateBlock:
 
 def _repo_root() -> Path:
     # This file lives at: <repo>/django/templates_app/views.py
-    # Going up two parents returns the repo root:
-    #   <repo>/django/templates_app/views.py -> parents[2] == <repo>
+    # Going up two parents returns the repo root.
     return Path(__file__).resolve().parents[2]
 
 
@@ -26,33 +24,13 @@ def _templates_txt_path() -> Path:
     return _repo_root() / "templates.txt"
 
 
+def _requests_txt_path() -> Path:
+    return _repo_root() / "requests.txt"
+
+
 def _parse_templates_txt(text: str) -> list[TemplateBlock]:
-    """Parse `templates.txt` into a list of TemplateBlock objects.
-
-    File format
-    -----------
-    Each template is a "block" separated by a line containing `---`.
-
-    The first non-empty line of a block must be the header:
-        {Button} = Title
-
-    All following lines in the block become the body.
-
-    Example
-    -------
-        {Button} = New Patient
-        Hi, this is Mobility Physical Therapy...
-        ---
-
-    Notes
-    -----
-    - Blocks that do not start with `{Button}` are ignored.
-    - The title can be written as `{Button} = Title` or `{Button}=Title`.
-    """
-
-    # Split into candidate blocks using the `---` delimiter.
+    """Parse templates.txt into TemplateBlock objects."""
     raw_blocks = text.split("---")
-
     blocks: list[TemplateBlock] = []
 
     for raw in raw_blocks:
@@ -62,7 +40,6 @@ def _parse_templates_txt(text: str) -> list[TemplateBlock]:
 
         lines = [ln.rstrip("\n") for ln in chunk.splitlines()]
 
-        # Remove leading/trailing empty lines to normalize parsing.
         while lines and not lines[0].strip():
             lines.pop(0)
         while lines and not lines[-1].strip():
@@ -75,10 +52,10 @@ def _parse_templates_txt(text: str) -> list[TemplateBlock]:
         if not header.startswith("{Button}"):
             continue
 
-        # Parse title: allow formats like "{Button} = Title" or "{Button}=Title"
         remainder = header.replace("{Button}", "", 1).strip()
         if remainder.startswith("="):
             remainder = remainder[1:].strip()
+
         title = remainder
         if not title:
             continue
@@ -100,21 +77,15 @@ def load_template_blocks() -> list[TemplateBlock]:
 
 # --- Helper constants and functions for placeholder validation ---
 _DAY_RE = re.compile(r"^[A-Za-z][A-Za-z\s-]*$")
-
-# Accept either MM/DD/YYYY (or M/D/YYYY) OR a human readable month format like "Feb 22, 2026".
 _DATE_NUMERIC_RE = re.compile(r"^(0?[1-9]|1[0-2])/(0?[1-9]|[12]\d|3[01])/\d{4}$")
 _DATE_TEXT_RE = re.compile(
     r"^(Jan|January|Feb|February|Mar|March|Apr|April|May|Jun|June|Jul|July|Aug|August|Sep|Sept|September|Oct|October|Nov|November|Dec|December)\s+([12]\d|3[01]|0?[1-9])(?:,\s*\d{4})?$",
     re.IGNORECASE,
 )
-
-# Accept "3:30 PM", "03:30pm", or 24-hour "15:30".
 _TIME_RE = re.compile(r"^(?:([01]?\d|2[0-3]):[0-5]\d)(?:\s*([AaPp][Mm]))?$")
 
 
 def _needs_placeholders(body: str) -> set[str]:
-    """Return the set of placeholder keys required by the template body."""
-
     required: set[str] = set()
     upper = body.upper()
     if "{DAY}" in upper:
@@ -127,58 +98,24 @@ def _needs_placeholders(body: str) -> set[str]:
 
 
 def _validate_day(value: str) -> Optional[str]:
-    """Validate DAY input.
-
-    Returns an error string if invalid; otherwise None.
-    """
-
     if not _DAY_RE.fullmatch(value):
         return "DAY must be letters only (spaces and hyphens allowed)."
     return None
 
 
 def _validate_date(value: str) -> Optional[str]:
-    """Validate DATE input.
-
-    Accepted formats:
-      - MM/DD/YYYY (e.g., 02/22/2026)
-      - Month Day[, Year] (e.g., Feb 22, 2026)
-
-    Returns an error string if invalid; otherwise None.
-    """
-
     if _DATE_NUMERIC_RE.fullmatch(value) or _DATE_TEXT_RE.fullmatch(value):
         return None
     return "DATE must look like 02/22/2026 or Feb 22, 2026."
 
 
 def _validate_time(value: str) -> Optional[str]:
-    """Validate TIME input.
-
-    Accepted formats:
-      - 3:30 PM
-      - 15:30
-
-    Returns an error string if invalid; otherwise None.
-    """
-
     if not _TIME_RE.fullmatch(value):
         return "TIME must look like 3:30 PM or 15:30."
     return None
 
 
 def _apply_placeholders(template: str, *, day: str, date: str, time: str) -> str:
-    """Replace supported placeholders in a template body.
-
-    `str.format()` is intentionally not used here because any unexpected `{...}`
-    token in the message would raise `KeyError`. This helper performs plain
-    string replacement for the placeholders listed below.
-
-    Supported placeholders:
-      - {DAY}, {DATE}, {TIME}
-      - {day}, {date}, {time}
-    """
-
     replacements = {
         "{DAY}": day,
         "{DATE}": date,
@@ -195,15 +132,9 @@ def _apply_placeholders(template: str, *, day: str, date: str, time: str) -> str
 
 
 def home(request):
-    """Render the template generator page.
-
-    GET: Show the template picker + input form.
-    POST: Validate input, apply placeholders, and display the generated message.
-    """
-
+    """Render the template generator page."""
     blocks = load_template_blocks()
 
-    # Defaults for initial page load and to preserve form state.
     selected_title = ""
     generated_message = ""
     error = ""
@@ -226,7 +157,6 @@ def home(request):
             else:
                 required_fields = _needs_placeholders(chosen.body)
 
-                # Required-field checks (only require what the template uses).
                 if "day" in required_fields and not day:
                     error = "DAY is required for this template."
                 elif "date" in required_fields and not date:
@@ -234,7 +164,6 @@ def home(request):
                 elif "time" in required_fields and not time:
                     error = "TIME is required for this template."
                 else:
-                    # Format checks (only validate what was provided / required).
                     if day and (msg := _validate_day(day)):
                         error = msg
                     elif date and (msg := _validate_date(date)):
@@ -257,3 +186,120 @@ def home(request):
             "time": time,
         },
     )
+
+
+# -----------------------------
+# Request tracker view helpers
+# -----------------------------
+
+def _load_requests() -> list[dict[str, str]]:
+    requests_file = _requests_txt_path()
+    stored_requests: list[dict[str, str]] = []
+
+    if not requests_file.exists():
+        return stored_requests
+
+    with requests_file.open("r", encoding="utf-8") as f:
+        for line in f:
+            parts = line.rstrip("\n").split("|")
+            if len(parts) != 8:
+                continue
+
+            stored_requests.append(
+                {
+                    "first_name": parts[0],
+                    "phone": parts[1],
+                    "event_name": parts[2],
+                    "details": parts[3],
+                    "preferred_day": parts[4],
+                    "preferred_date": parts[5],
+                    "earliest_time": parts[6],
+                    "latest_time": parts[7],
+                }
+            )
+
+    return stored_requests
+
+
+def _save_requests(requests: list[dict[str, str]]) -> None:
+    requests_file = _requests_txt_path()
+    with requests_file.open("w", encoding="utf-8") as f:
+        for r in requests:
+            line = "|".join(
+                [
+                    r.get("first_name", ""),
+                    r.get("phone", ""),
+                    r.get("event_name", ""),
+                    r.get("details", "")[:50],
+                    r.get("preferred_day", ""),
+                    r.get("preferred_date", ""),
+                    r.get("earliest_time", ""),
+                    r.get("latest_time", ""),
+                ]
+            )
+            f.write(line + "\n")
+
+
+def _build_request_text(request_item: dict[str, str]) -> str:
+    day = request_item.get("preferred_day") or "the requested day"
+    date = request_item.get("preferred_date") or "the requested date"
+    earliest = request_item.get("earliest_time") or "the earliest available time"
+    latest = request_item.get("latest_time") or "the latest available time"
+
+    return (
+        "Hello, this is Mobility Physical Therapy.\n\n"
+        f"We have an opening available on {day}, {date} between {earliest} and {latest}.\n\n"
+        "Please call us at 714-389-9306 if you would like to schedule.\n\n"
+        "Thank you."
+    )
+
+
+def request_view(request):
+    generated_text = ""
+    stored_requests = _load_requests()
+
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+
+        request_item = {
+            "first_name": request.POST.get("first_name", "").strip(),
+            "phone": request.POST.get("phone", "").strip(),
+            "event_name": request.POST.get("event_name", "").strip(),
+            "details": request.POST.get("details", "").strip()[:50],
+            "preferred_day": request.POST.get("preferred_day", "").strip(),
+            "preferred_date": request.POST.get("preferred_date", "").strip(),
+            "earliest_time": request.POST.get("earliest_time", "").strip(),
+            "latest_time": request.POST.get("latest_time", "").strip(),
+        }
+
+        if action in {"save", "save_request"}:
+            stored_requests.append(request_item)
+            _save_requests(stored_requests)
+
+        elif action == "generate_text":
+            generated_text = _build_request_text(request_item)
+
+        elif action == "generate_from_saved":
+            try:
+                index = int(request.POST.get("row_index", "-1"))
+            except ValueError:
+                index = -1
+
+            if 0 <= index < len(stored_requests):
+                generated_text = _build_request_text(stored_requests[index])
+
+        elif action == "delete_request":
+            try:
+                index = int(request.POST.get("row_index", "-1"))
+            except ValueError:
+                index = -1
+
+            if 0 <= index < len(stored_requests):
+                del stored_requests[index]
+                _save_requests(stored_requests)
+
+    context = {
+        "requests": stored_requests,
+        "generated_text": generated_text,
+    }
+    return render(request, "request.html", context)

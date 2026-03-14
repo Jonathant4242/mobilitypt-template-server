@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Tracker</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Request Tracker</h1>
+      <p class="muted">Use this page to capture appointment requests, organize them, and quickly generate a message.</p>
+    </div>
+
+    <div class="card">
+      <h2 class="template-title">Add Request</h2>
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="request-grid">
+          <div>
+            <label for="first_name">Patient's First Name</label>
+            <input id="first_name" type="text" name="first_name" placeholder="John" required>
+          </div>
+
+          <div>
+            <label for="phone">Phone Number</label>
+            <input id="phone" type="text" name="phone" placeholder="714-555-1234">
+          </div>
+
+          <div class="request-grid-full">
+            <label for="event_name">Calendar Event Name</label>
+            <input id="event_name" type="text" name="event_name" placeholder="First Name, Last Name (INSURANCE)">
+          </div>
+
+          <div class="request-grid-full">
+            <label for="details">Details</label>
+            <input id="details" type="text" name="details" placeholder="Short note only" maxlength="50">
+          </div>
+
+          <div>
+            <label for="preferred_day">Preferred Day</label>
+            <select id="preferred_day" name="preferred_day">
+              <option value="">-- Select Day --</option>
+              <option value="Sunday">Sunday</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="preferred_date">Preferred Date</label>
+            <select id="preferred_date" name="preferred_date" disabled>
+              <option value="">-- Select Date --</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="earliest_time">Earliest Time</label>
+            <select id="earliest_time" name="earliest_time">
+              <option value="">-- Select Earliest Time --</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="latest_time">Latest Time</label>
+            <select id="latest_time" name="latest_time">
+              <option value="">-- Select Latest Time --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-row request-actions">
+          <button type="submit" name="action" value="generate_text" class="button-secondary">Generate Text</button>
+          <button type="submit" name="action" value="save">Save Request</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="template-title">Saved Requests</h2>
+
+      {% if requests %}
+        <div class="table-wrap">
+          <table class="request-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Phone</th>
+                <th>Event</th>
+                <th>Details</th>
+                <th>Day / Date</th>
+                <th>Time Window</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in requests %}
+                <tr>
+                  <td>{{ r.first_name }}</td>
+                  <td>{{ r.phone }}</td>
+                  <td>{{ r.event_name }}</td>
+                  <td>{{ r.details }}</td>
+                  <td>{{ r.preferred_day }} {{ r.preferred_date }}</td>
+                  <td>{{ r.earliest_time }} - {{ r.latest_time }}</td>
+                  <td>
+                    <div class="button-row">
+                      <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="row_index" value="{{ forloop.counter0 }}">
+                        <button type="submit" name="action" value="generate_from_saved" class="button-secondary">Generate</button>
+                      </form>
+
+                      <form method="POST" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="row_index" value="{{ forloop.counter0 }}">
+                        <button type="submit" name="action" value="delete_request">Delete</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="muted empty-state">No requests saved yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2 class="template-title">Generated Text</h2>
+      <pre>{{ generated_text }}</pre>
+    </div>
+  </div>
+
+  <script defer src="{% static 'ux-lib.js' %}"></script>
+  <script defer src="{% static 'request.js' %}"></script>
+</body>
+</html>
