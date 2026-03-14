@@ -32,3 +32,16 @@ Thumbs.db
 
 # Logs
 *.log
+
+# ----------------------------
+# Java Module
+# ----------------------------
+*.class
+*.jar
+*.war
+*.ear
+out/
+bin/
+
+# Runtime data (generated during testing)
+request.txt

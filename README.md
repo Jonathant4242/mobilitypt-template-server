@@ -1,5 +1,59 @@
 # Walkthrough Videos — John T.
 
+## Sprint 3 (Java Module: Request Processing)
+
+Loom (Sprint 3):
+
+### What this does
+
+Sprint 3 introduces a Java module that processes appointment requests saved by the Django web interface.
+
+The system now works as a two-part architecture:
+
+1. **Django Web App**
+   - Captures patient request information through `request.html`.
+   - Saves request data into a shared file: `requests.txt`.
+
+2. **Java Module**
+   - Reads requests from `requests.txt`.
+   - Displays saved requests.
+   - Generates patient text messages.
+   - Allows deletion of outdated requests.
+
+### Java Components
+
+The Java module is located in `java-module/` and contains:
+
+- `Main.java` – command line menu for interacting with saved requests
+- `RequestItem.java` – class representing a request record
+- `RequestStore.java` – handles reading/writing request data from `requests.txt`
+- `Template.java` – represents a text template
+- `TemplateLoader.java` – loads templates from `templates.txt`
+- `MessageGenerator.java` – builds a patient message from request data
+
+### Features Demonstrated
+
+The Java program demonstrates the required course concepts:
+
+- **Conditionals** – menu selections and input validation
+- **Loops** – iterating through request lists and menu interactions
+- **Functions / Methods** – modular methods for loading, saving, and generating messages
+- **Classes** – structured objects for templates and request items
+- **Java Collection Framework** – `ArrayList` used for storing templates and requests
+
+### Stretch Goal Completed
+
+File-based persistence is implemented:
+
+- Django writes requests to `requests.txt`
+- Java reads, updates, and deletes requests from the same file
+
+This demonstrates communication between two independent systems using shared file storage.
+
+---
+
+# Walkthrough Videos — John T.
+
 ## Sprint 2 (Web App Framework: Django)
 
 Loom (Sprint 2): https://www.loom.com/share/4ed9510a2f1d40bebdf6b0cf720603c9
