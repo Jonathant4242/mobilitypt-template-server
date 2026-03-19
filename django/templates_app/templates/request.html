@@ -97,6 +97,7 @@
                 <th>Details</th>
                 <th>Day / Date</th>
                 <th>Time Window</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -109,6 +110,18 @@
                   <td>{{ r.details }}</td>
                   <td>{{ r.preferred_day }} {{ r.preferred_date }}</td>
                   <td>{{ r.earliest_time }} - {{ r.latest_time }}</td>
+                  <td>
+                    <form method="POST" style="display:inline;">
+                      {% csrf_token %}
+                      <input type="hidden" name="request_id" value="{{ r.id }}">
+                      <select name="status">
+                        <option value="New" {% if r.status == "New" %}selected{% endif %}>New</option>
+                        <option value="Contacted" {% if r.status == "Contacted" %}selected{% endif %}>Contacted</option>
+                        <option value="Closed" {% if r.status == "Closed" %}selected{% endif %}>Closed</option>
+                      </select>
+                      <button type="submit" name="action" value="update_status" class="button-secondary">Update</button>
+                    </form>
+                  </td>
                   <td>
                     <div class="button-row">
                       <form method="POST" style="display:inline;">

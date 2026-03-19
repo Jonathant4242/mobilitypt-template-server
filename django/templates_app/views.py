@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 import re
+import sqlite3
 from typing import Optional
 
 from django.shortcuts import render
@@ -24,8 +26,43 @@ def _templates_txt_path() -> Path:
     return _repo_root() / "templates.txt"
 
 
-def _requests_txt_path() -> Path:
-    return _repo_root() / "requests.txt"
+def _requests_db_path() -> Path:
+    return _repo_root() / "requests.db"
+
+
+def _get_connection() -> sqlite3.Connection:
+    conn = sqlite3.connect(_requests_db_path())
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_requests_db() -> None:
+    with _get_connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                first_name TEXT NOT NULL,
+                phone TEXT NOT NULL,
+                event_name TEXT NOT NULL,
+                details TEXT,
+                preferred_day TEXT,
+                preferred_date TEXT,
+                earliest_time TEXT,
+                latest_time TEXT,
+                status TEXT NOT NULL DEFAULT 'New',
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        columns = {
+            row["name"] for row in conn.execute("PRAGMA table_info(requests)").fetchall()
+        }
+        if "status" not in columns:
+            conn.execute(
+                "ALTER TABLE requests ADD COLUMN status TEXT NOT NULL DEFAULT 'New'"
+            )
+        conn.commit()
 
 
 def _parse_templates_txt(text: str) -> list[TemplateBlock]:
@@ -193,51 +230,106 @@ def home(request):
 # -----------------------------
 
 def _load_requests() -> list[dict[str, str]]:
-    requests_file = _requests_txt_path()
+    _init_requests_db()
+
+    with _get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                id,
+                first_name,
+                phone,
+                event_name,
+                details,
+                preferred_day,
+                preferred_date,
+                earliest_time,
+                latest_time,
+                status,
+                created_at
+            FROM requests
+            ORDER BY id ASC
+            """
+        ).fetchall()
+
     stored_requests: list[dict[str, str]] = []
-
-    if not requests_file.exists():
-        return stored_requests
-
-    with requests_file.open("r", encoding="utf-8") as f:
-        for line in f:
-            parts = line.rstrip("\n").split("|")
-            if len(parts) != 8:
-                continue
-
-            stored_requests.append(
-                {
-                    "first_name": parts[0],
-                    "phone": parts[1],
-                    "event_name": parts[2],
-                    "details": parts[3],
-                    "preferred_day": parts[4],
-                    "preferred_date": parts[5],
-                    "earliest_time": parts[6],
-                    "latest_time": parts[7],
-                }
-            )
+    for row in rows:
+        stored_requests.append(
+            {
+                "id": str(row["id"]),
+                "first_name": row["first_name"] or "",
+                "phone": row["phone"] or "",
+                "event_name": row["event_name"] or "",
+                "details": row["details"] or "",
+                "preferred_day": row["preferred_day"] or "",
+                "preferred_date": row["preferred_date"] or "",
+                "earliest_time": row["earliest_time"] or "",
+                "latest_time": row["latest_time"] or "",
+                "status": row["status"] or "New",
+                "created_at": row["created_at"] or "",
+            }
+        )
 
     return stored_requests
 
 
-def _save_requests(requests: list[dict[str, str]]) -> None:
-    requests_file = _requests_txt_path()
-    with requests_file.open("w", encoding="utf-8") as f:
-        for r in requests:
-            line = "|".join(
-                [
-                    r.get("first_name", ""),
-                    r.get("phone", ""),
-                    r.get("event_name", ""),
-                    r.get("details", "")[:50],
-                    r.get("preferred_day", ""),
-                    r.get("preferred_date", ""),
-                    r.get("earliest_time", ""),
-                    r.get("latest_time", ""),
-                ]
+def _insert_request(request_item: dict[str, str]) -> None:
+    _init_requests_db()
+
+    with _get_connection() as conn:
+        conn.execute(
+            """
+            INSERT INTO requests (
+                first_name,
+                phone,
+                event_name,
+                details,
+                preferred_day,
+                preferred_date,
+                earliest_time,
+                latest_time,
+                status,
+                created_at
             )
-            f.write(line + "\n")
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                request_item.get("first_name", ""),
+                request_item.get("phone", ""),
+                request_item.get("event_name", ""),
+                request_item.get("details", "")[:50],
+                request_item.get("preferred_day", ""),
+                request_item.get("preferred_date", ""),
+                request_item.get("earliest_time", ""),
+                request_item.get("latest_time", ""),
+                "New",
+                datetime.now().isoformat(timespec="seconds"),
+            ),
+        )
+        conn.commit()
+
+
+def _delete_request_by_id(request_id: int) -> None:
+    _init_requests_db()
+
+    with _get_connection() as conn:
+        conn.execute("DELETE FROM requests WHERE id = ?", (request_id,))
+        conn.commit()
+
+
+def _update_request_status(request_id: int, status: str) -> None:
+    _init_requests_db()
+
+    allowed_statuses = {"New", "Contacted", "Closed"}
+    if status not in allowed_statuses:
+        return
+
+    with _get_connection() as conn:
+        conn.execute(
+            "UPDATE requests SET status = ? WHERE id = ?",
+            (status, request_id),
+        )
+        conn.commit()
 
 
 def _build_request_text(request_item: dict[str, str]) -> str:
@@ -273,8 +365,8 @@ def request_view(request):
         }
 
         if action in {"save", "save_request"}:
-            stored_requests.append(request_item)
-            _save_requests(stored_requests)
+            _insert_request(request_item)
+            stored_requests = _load_requests()
 
         elif action == "generate_text":
             generated_text = _build_request_text(request_item)
@@ -288,6 +380,18 @@ def request_view(request):
             if 0 <= index < len(stored_requests):
                 generated_text = _build_request_text(stored_requests[index])
 
+        elif action == "update_status":
+            try:
+                request_id = int(request.POST.get("request_id", "-1"))
+            except ValueError:
+                request_id = -1
+
+            status = request.POST.get("status", "").strip()
+
+            if request_id >= 0:
+                _update_request_status(request_id, status)
+                stored_requests = _load_requests()
+
         elif action == "delete_request":
             try:
                 index = int(request.POST.get("row_index", "-1"))
@@ -295,8 +399,9 @@ def request_view(request):
                 index = -1
 
             if 0 <= index < len(stored_requests):
-                del stored_requests[index]
-                _save_requests(stored_requests)
+                request_id = int(stored_requests[index]["id"])
+                _delete_request_by_id(request_id)
+                stored_requests = _load_requests()
 
     context = {
         "requests": stored_requests,
