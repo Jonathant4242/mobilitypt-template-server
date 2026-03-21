@@ -34,6 +34,15 @@
             <label for="event_name">Calendar Event Name</label>
             <input id="event_name" type="text" name="event_name" placeholder="First Name, Last Name (INSURANCE)">
           </div>
+          <div>
+            <label for="visit_type">Visit Type</label>
+            <select id="visit_type" name="visit_type">
+              <option value="">-- Select Visit Type --</option>
+              <option value="EVAL">EVAL</option>
+              <option value="FOLLOW UP">FOLLOW UP</option>
+              <option value="GROUP">GROUP</option>
+            </select>
+          </div>
 
           <div class="request-grid-full">
             <label for="details">Details</label>
@@ -41,43 +50,37 @@
           </div>
 
           <div>
-            <label for="preferred_day">Preferred Day</label>
-            <select id="preferred_day" name="preferred_day">
-              <option value="">-- Select Day --</option>
-              <option value="Sunday">Sunday</option>
-              <option value="Monday">Monday</option>
-              <option value="Tuesday">Tuesday</option>
-              <option value="Wednesday">Wednesday</option>
-              <option value="Thursday">Thursday</option>
-              <option value="Friday">Friday</option>
-              <option value="Saturday">Saturday</option>
+            <label for="week_of">Week Of</label>
+            <select id="week_of" name="week_of">
+              <option value="">-- Select Week --</option>
+              {% for week in week_options %}
+                <option value="{{ week }}">{{ week }}</option>
+              {% endfor %}
             </select>
           </div>
 
-          <div>
-            <label for="preferred_date">Preferred Date</label>
-            <select id="preferred_date" name="preferred_date" disabled>
-              <option value="">-- Select Date --</option>
-            </select>
+          <div class="request-grid-full">
+            <label>Preferred Days</label>
+            <div class="button-row" style="gap: 1rem; flex-wrap: wrap;">
+              <label><input type="checkbox" name="preferred_days" value="Monday"> Monday</label>
+              <label><input type="checkbox" name="preferred_days" value="Tuesday"> Tuesday</label>
+              <label><input type="checkbox" name="preferred_days" value="Wednesday"> Wednesday</label>
+              <label><input type="checkbox" name="preferred_days" value="Thursday"> Thursday</label>
+              <label><input type="checkbox" name="preferred_days" value="Friday"> Friday</label>
+            </div>
           </div>
 
-          <div>
-            <label for="earliest_time">Earliest Time</label>
-            <select id="earliest_time" name="earliest_time">
-              <option value="">-- Select Earliest Time --</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="latest_time">Latest Time</label>
-            <select id="latest_time" name="latest_time">
-              <option value="">-- Select Latest Time --</option>
-            </select>
+          <div class="request-grid-full">
+            <label>Time Preference</label>
+            <div class="button-row" style="gap: 1rem; flex-wrap: wrap;">
+              <label><input type="checkbox" name="time_preferences" value="Morning"> Morning</label>
+              <label><input type="checkbox" name="time_preferences" value="Afternoon"> Afternoon</label>
+              <label><input type="checkbox" name="time_preferences" value="Evening"> Evening</label>
+            </div>
           </div>
         </div>
 
         <div class="button-row request-actions">
-          <button type="submit" name="action" value="generate_text" class="button-secondary">Generate Text</button>
           <button type="submit" name="action" value="save">Save Request</button>
         </div>
       </form>
@@ -85,6 +88,40 @@
 
     <div class="card">
       <h2 class="template-title">Saved Requests</h2>
+
+      <div class="button-row" style="margin-bottom: 1rem;">
+        <form method="GET" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+          <label for="sort"><strong>Sort By</strong></label>
+          <select id="sort" name="sort">
+            <option value="oldest" {% if sort_by == "oldest" %}selected{% endif %}>Oldest First</option>
+            <option value="newest" {% if sort_by == "newest" %}selected{% endif %}>Newest First</option>
+            <option value="patient_asc" {% if sort_by == "patient_asc" %}selected{% endif %}>Patient A–Z</option>
+            <option value="patient_desc" {% if sort_by == "patient_desc" %}selected{% endif %}>Patient Z–A</option>
+            <option value="status_asc" {% if sort_by == "status_asc" %}selected{% endif %}>Status A–Z</option>
+            <option value="status_desc" {% if sort_by == "status_desc" %}selected{% endif %}>Status Z–A</option>
+          </select>
+
+          <label for="day_filter"><strong>Day</strong></label>
+          <select id="day_filter" name="day_filter">
+            <option value="" {% if not day_filter %}selected{% endif %}>All Days</option>
+            <option value="Monday" {% if day_filter == "Monday" %}selected{% endif %}>Monday</option>
+            <option value="Tuesday" {% if day_filter == "Tuesday" %}selected{% endif %}>Tuesday</option>
+            <option value="Wednesday" {% if day_filter == "Wednesday" %}selected{% endif %}>Wednesday</option>
+            <option value="Thursday" {% if day_filter == "Thursday" %}selected{% endif %}>Thursday</option>
+            <option value="Friday" {% if day_filter == "Friday" %}selected{% endif %}>Friday</option>
+          </select>
+
+          <label for="visit_type_filter"><strong>Visit Type</strong></label>
+          <select id="visit_type_filter" name="visit_type_filter">
+            <option value="" {% if not visit_type_filter %}selected{% endif %}>All Types</option>
+            <option value="EVAL" {% if visit_type_filter == "EVAL" %}selected{% endif %}>EVAL</option>
+            <option value="FOLLOW UP" {% if visit_type_filter == "FOLLOW UP" %}selected{% endif %}>FOLLOW UP</option>
+            <option value="GROUP" {% if visit_type_filter == "GROUP" %}selected{% endif %}>GROUP</option>
+          </select>
+
+          <button type="submit" class="button-secondary">Apply</button>
+        </form>
+      </div>
 
       {% if requests %}
         <div class="table-wrap">
@@ -94,10 +131,11 @@
                 <th>Patient</th>
                 <th>Phone</th>
                 <th>Event</th>
+                <th>Visit Type</th>
                 <th>Details</th>
-                <th>Day / Date</th>
-                <th>Time Window</th>
-                <th>Status</th>
+                <th>Week / Days</th>
+                <th>Time Preference</th>
+                <th>Contact Attempt</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -107,32 +145,44 @@
                   <td>{{ r.first_name }}</td>
                   <td>{{ r.phone }}</td>
                   <td>{{ r.event_name }}</td>
+                  <td>{{ r.visit_type }}</td>
                   <td>{{ r.details }}</td>
-                  <td>{{ r.preferred_day }} {{ r.preferred_date }}</td>
-                  <td>{{ r.earliest_time }} - {{ r.latest_time }}</td>
+                  <td>{{ r.preferred_date }}{% if r.preferred_day %}<br><span class="muted">{{ r.preferred_day }}</span>{% endif %}</td>
+                  <td>{{ r.earliest_time }}</td>
                   <td>
                     <form method="POST" style="display:inline;">
                       {% csrf_token %}
                       <input type="hidden" name="request_id" value="{{ r.id }}">
+                      <input type="hidden" name="sort" value="{{ sort_by }}">
+                      <input type="hidden" name="day_filter" value="{{ day_filter }}">
+                      <input type="hidden" name="visit_type_filter" value="{{ visit_type_filter }}">
                       <select name="status">
-                        <option value="New" {% if r.status == "New" %}selected{% endif %}>New</option>
+                        <option value="---" {% if r.status == "---" %}selected{% endif %}>---</option>
+                        <option value="LM" {% if r.status == "LM" %}selected{% endif %}>LM</option>
+                        <option value="Text" {% if r.status == "Text" %}selected{% endif %}>Text</option>
+                        <option value="LM &amp; TEXT" {% if r.status == "LM & TEXT" %}selected{% endif %}>LM &amp; TEXT</option>
                         <option value="Contacted" {% if r.status == "Contacted" %}selected{% endif %}>Contacted</option>
-                        <option value="Closed" {% if r.status == "Closed" %}selected{% endif %}>Closed</option>
                       </select>
                       <button type="submit" name="action" value="update_status" class="button-secondary">Update</button>
                     </form>
                   </td>
                   <td>
                     <div class="button-row">
-                      <form method="POST" style="display:inline;">
-                        {% csrf_token %}
-                        <input type="hidden" name="row_index" value="{{ forloop.counter0 }}">
-                        <button type="submit" name="action" value="generate_from_saved" class="button-secondary">Generate</button>
-                      </form>
+                      <button
+                        type="button"
+                        class="button-secondary open-generate-modal"
+                        data-row-index="{{ forloop.counter0 }}"
+                        data-patient="{{ r.first_name|escape }}"
+                      >
+                        Generate
+                      </button>
 
                       <form method="POST" style="display:inline;">
                         {% csrf_token %}
                         <input type="hidden" name="row_index" value="{{ forloop.counter0 }}">
+                        <input type="hidden" name="sort" value="{{ sort_by }}">
+                        <input type="hidden" name="day_filter" value="{{ day_filter }}">
+                        <input type="hidden" name="visit_type_filter" value="{{ visit_type_filter }}">
                         <button type="submit" name="action" value="delete_request">Delete</button>
                       </form>
                     </div>
@@ -147,13 +197,71 @@
       {% endif %}
     </div>
 
+    <div id="generate-modal" class="card" style="display:none; position:fixed; inset:0; margin:auto; max-width:42rem; width:calc(100% - 2rem); z-index:1000; max-height:90vh; overflow:auto; box-shadow:0 1.5rem 3rem rgba(0,0,0,0.25);">
+      <h2 class="template-title">Waitlist Opening</h2>
+      <p class="muted" id="generate-modal-subtitle">Enter the opening details, then generate the message.</p>
+
+      <form method="POST" id="generate-modal-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="generate_from_saved">
+        <input type="hidden" name="row_index" id="generate_row_index" value="">
+        <input type="hidden" name="sort" value="{{ sort_by }}">
+        <input type="hidden" name="day_filter" value="{{ day_filter }}">
+        <input type="hidden" name="visit_type_filter" value="{{ visit_type_filter }}">
+
+        <div class="request-grid">
+          <div>
+            <label for="generate_day">Day</label>
+            <select id="generate_day" name="generate_day">
+              <option value="">-- Select Day --</option>
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="generate_date">Date</label>
+            <select id="generate_date" name="generate_date" disabled>
+              <option value="">-- Select Date --</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="generate_time_select">Time</label>
+            <select id="generate_time_select" aria-label="Generate time selection">
+              <option value="">-- Select Time --</option>
+              <option value="Morning">Morning</option>
+              <option value="Afternoon">Afternoon</option>
+              <option value="Evening">Evening</option>
+              <option value="Custom">Custom</option>
+            </select>
+          </div>
+
+          <div class="request-grid-full">
+            <label for="generate_time_custom">Custom Time (optional)</label>
+            <input id="generate_time_custom" type="text" placeholder="9:30 AM">
+            <input type="hidden" name="generate_time" id="generate_time" value="">
+          </div>
+        </div>
+
+        <div class="button-row request-actions">
+          <button type="submit" class="button-secondary">Generate Message</button>
+          <button type="button" id="close-generate-modal" class="button-secondary">Close</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="generate-modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999;"></div>
+
     <div class="card">
       <h2 class="template-title">Generated Text</h2>
       <pre>{{ generated_text }}</pre>
     </div>
   </div>
-
+  <script defer src="{% static 'request-modal.js' %}"></script>
   <script defer src="{% static 'ux-lib.js' %}"></script>
-  <script defer src="{% static 'request.js' %}"></script>
 </body>
 </html>

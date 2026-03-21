@@ -1,4 +1,0 @@
-John|714-555-1234|Eval|Blue Cross|Friday|Mar 21, 2026|8:00 AM|1:00 PM
-Maria|714-555-9821|Follow-Up|Knee Rehab|Tuesday|Mar 25, 2026|9:00 AM|12:00 PM
-David|949-555-4477|New Patient|Aetna|Monday|Mar 24, 2026|10:00 AM|2:00 PM
-Sarah|714-555-6612|Eval|Post Surgery|Thursday|Mar 27, 2026|8:30 AM|11:30 AM
