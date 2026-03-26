@@ -28,6 +28,7 @@
     return;
   }
 
+  // Map weekdays to JavaScript day numbers.
   const weekdayMap = {
     Monday: 1,
     Tuesday: 2,
@@ -36,6 +37,7 @@
     Friday: 5,
   };
 
+  // Format dates for the dropdown.
   function formatDate(date) {
     return date.toLocaleDateString('en-US', {
       month: 'short',
@@ -44,6 +46,7 @@
     });
   }
 
+  // Build the next 12 dates for the selected weekday.
   function nextDatesForWeekday(dayName, count) {
     const target = weekdayMap[dayName];
     if (!target) {
@@ -67,6 +70,7 @@
     return results;
   }
 
+  // Refill the date dropdown when the day changes.
   function populateGenerateDates() {
     const selectedDay = dayInput.value;
     dateInput.innerHTML = '<option value="">-- Select Date --</option>';
@@ -87,6 +91,7 @@
     dateInput.disabled = false;
   }
 
+  // Sync the visible time input into the hidden field.
   function syncGenerateTime() {
     const customValue = timeCustom.value.trim();
     if (customValue) {
@@ -102,6 +107,7 @@
     timeHidden.value = '';
   }
 
+  // Reset modal fields before each use.
   function resetModalFields() {
     dayInput.value = '';
     dateInput.innerHTML = '<option value="">-- Select Date --</option>';
@@ -111,6 +117,7 @@
     timeHidden.value = '';
   }
 
+  // Open the modal for the selected request.
   function openModal(rowIndex, patientName) {
     resetModalFields();
     rowIndexInput.value = rowIndex || '';
@@ -122,11 +129,13 @@
     dayInput.focus();
   }
 
+  // Close the modal.
   function closeModal() {
     modal.style.display = 'none';
     backdrop.style.display = 'none';
   }
 
+  // Connect each Generate button to the modal.
   openButtons.forEach((button) => {
     button.addEventListener('click', function () {
       openModal(button.dataset.rowIndex, button.dataset.patient || '');
@@ -143,6 +152,7 @@
     syncGenerateTime();
   });
 
+  // Let Escape close the modal.
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' && modal.style.display === 'block') {
       closeModal();

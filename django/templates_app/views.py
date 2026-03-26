@@ -10,6 +10,7 @@ from typing import Optional
 from django.shortcuts import render
 
 
+ # Allowed values for contact-attempt tracking and request-page filters.
 ALLOWED_STATUSES = {"---", "LM", "Text", "LM & TEXT", "Contacted"}
 ALLOWED_SORTS = {
     "oldest": "id ASC",
@@ -29,6 +30,7 @@ class TemplateBlock:
     body: str
 
 
+ # Shared file-path helpers.
 def _repo_root() -> Path:
     # This file lives at: <repo>/django/templates_app/views.py
     # Going up two parents returns the repo root.
@@ -49,6 +51,7 @@ def _get_connection() -> sqlite3.Connection:
     return conn
 
 
+ # Create the requests table and add missing columns for older databases.
 def _init_requests_db() -> None:
     with _get_connection() as conn:
         conn.execute(
@@ -83,6 +86,7 @@ def _init_requests_db() -> None:
         conn.commit()
 
 
+ # Normalize UI inputs before they are used in queries.
 def _normalize_sort_by(sort_by: str) -> str:
     if sort_by in ALLOWED_SORTS:
         return sort_by
@@ -117,6 +121,7 @@ def _build_week_options() -> list[str]:
     ]
 
 
+ # Template loading for the home page generator.
 def _parse_templates_txt(text: str) -> list[TemplateBlock]:
     """Parse templates.txt into TemplateBlock objects."""
     raw_blocks = text.split("---")
@@ -220,6 +225,7 @@ def _apply_placeholders(template: str, *, day: str, date: str, time: str) -> str
     return out
 
 
+ # Main template generator page.
 def home(request):
     """Render the template generator page."""
     blocks = load_template_blocks()
@@ -278,9 +284,10 @@ def home(request):
 
 
 # -----------------------------
-# Request tracker view helpers
+# Request tracker database helpers
 # -----------------------------
 
+ # Load saved requests with optional sorting and filtering.
 def _load_requests(
     sort_by: str = "oldest",
     day_filter: str = "",
@@ -354,6 +361,7 @@ def _load_requests(
     return stored_requests
 
 
+ # Insert a new request record.
 def _insert_request(request_item: dict[str, str]) -> None:
     _init_requests_db()
 
@@ -392,6 +400,7 @@ def _insert_request(request_item: dict[str, str]) -> None:
         conn.commit()
 
 
+ # Delete a request by database id.
 def _delete_request_by_id(request_id: int) -> None:
     _init_requests_db()
 
@@ -400,6 +409,7 @@ def _delete_request_by_id(request_id: int) -> None:
         conn.commit()
 
 
+ # Update the contact-attempt value for one request.
 def _update_request_status(request_id: int, status: str) -> None:
     _init_requests_db()
 
@@ -414,6 +424,7 @@ def _update_request_status(request_id: int, status: str) -> None:
         conn.commit()
 
 
+ # Build the waitlist-opening text using saved values or popup overrides.
 def _build_request_text(
     request_item: dict[str, str],
     override_day: str = "",
@@ -432,6 +443,7 @@ def _build_request_text(
     )
 
 
+ # Request tracker page: save, filter, generate, update, and delete.
 def request_view(request):
     generated_text = ""
     sort_by = _normalize_sort_by(
@@ -449,6 +461,7 @@ def request_view(request):
     if request.method == "POST":
         action = request.POST.get("action", "")
 
+        # Collect request-form values and popup generate overrides from the current POST.
         request_item = {
             "first_name": request.POST.get("first_name", "").strip(),
             "phone": request.POST.get("phone", "").strip(),
