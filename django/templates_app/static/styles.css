@@ -1,3 +1,4 @@
+/* Design tokens */
 :root {
   /* Typography */
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -35,7 +36,7 @@
   --shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
 }
 
-/* Global defaults */
+/* Base elements */
 * {
   box-sizing: border-box;
 }
@@ -52,6 +53,7 @@ body {
   background: var(--bg);
 }
 
+/* Layout */
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -67,6 +69,7 @@ h1 {
   margin: 0 0 var(--space-7) 0;
 }
 
+/* Shared surfaces */
 .card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -76,6 +79,7 @@ h1 {
   background: var(--bg);
 }
 
+/* Form and grid helpers */
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -92,6 +96,7 @@ label {
   margin-bottom: var(--space-1);
 }
 
+/* Form controls */
 select,
 input {
   width: 100%;
@@ -108,6 +113,7 @@ button:focus {
   outline-offset: 2px;
 }
 
+/* Buttons */
 button {
   padding: var(--space-3) var(--space-5);
   border: 1px solid var(--button-bg);
@@ -122,6 +128,7 @@ button:hover {
   opacity: 0.92;
 }
 
+/* Feedback and content blocks */
 .error {
   color: var(--danger);
   font-weight: 600;
@@ -176,7 +183,7 @@ hr {
   width: 100%;
 }
 
-/* Small screens */
+/* Responsive layout */
 @media (max-width: 720px) {
   body {
     margin: 16px;
@@ -187,7 +194,7 @@ hr {
   }
 }
 
-/* Request tracker page */
+/* Request tracker */
 .request-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -214,6 +221,7 @@ hr {
   border-color: var(--border);
 }
 
+/* Request table */
 .table-wrap {
   overflow-x: auto;
 }

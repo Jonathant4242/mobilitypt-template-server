@@ -1,3 +1,73 @@
+# Mobility PT Cancellation Gap Filler Assistant
+
+A Django + SQLite clinic admin tool for tracking waitlist requests, organizing contact attempts, and generating waitlist-opening messages. The software helps manage patient requests in one place, sort and filter active requests, and quickly generate outreach text for open appointment times.
+
+## Instructions for Build and Use
+
+[Software Demo](Put_Your_Video_Link_Here)
+
+### Steps to build and/or run the software
+
+1. Open a terminal in the project folder.
+2. Change into the Django folder:
+   ```bash
+   cd django
+   ```
+3. Activate the virtual environment:
+   ```bash
+   source .venv/bin/activate
+   ```
+4. Start the Django development server:
+   ```bash
+   python manage.py runserver
+   ```
+5. Open the software in a browser at `http://127.0.0.1:8000/` for the template generator and `http://127.0.0.1:8000/request/` for the request tracker.
+
+### Instructions for using the software
+
+1. Open the **Request Tracker** page to add and manage active requests.
+2. Enter the patient name, phone number, calendar event name, visit type, details, preferred day/date, and time preference.
+3. Save the request so it is stored in the SQLite database.
+4. Use **Sort By**, **Day**, and **Visit Type** filters to narrow the waitlist.
+5. Update the **Contact Attempt** field as outreach is made.
+6. Click **Generate** to open the waitlist-opening popup, choose a day, date, and time, and generate the message.
+7. Copy the generated text into Google Voice or another texting system.
+8. Delete requests after they are handled or no longer needed.
+
+## Development Environment
+
+To recreate the development environment, I used the following software and libraries:
+
+- Python 3
+- Django 5.2.11
+- SQLite 3 (through Python's built-in `sqlite3` library)
+- JavaScript for page interactions and modal behavior
+- HTML and CSS for the user interface
+- VS Code for development
+- Git and GitHub for version control
+
+## Useful Websites to Learn More
+
+I found these websites useful while developing this software:
+
+- [Django Databases Documentation](https://docs.djangoproject.com/en/6.0/ref/databases/)
+- [Python sqlite3 Documentation](https://docs.python.org/3/library/sqlite3.html)
+- [SQLite CREATE TABLE Documentation](https://www.sqlite.org/lang_createtable.html)
+- [SQLite SQL Language Reference](https://www.sqlite.org/lang.html)
+- [SQLite Foreign Key Support](https://www.sqlite.org/foreignkeys.html)
+- [Django Tutorial Part 2](https://docs.djangoproject.com/en/6.0/intro/tutorial02/)
+
+## Future Work
+
+The following items I plan to improve in the future:
+
+- [ ] Clean up the quick-generate text templates so the wording reads better for both a specific appointment time and a broader time-of-day option like morning, afternoon, or evening.
+- [ ] Add a copy button for the generated message so I can move text into Google Voice faster.
+- [ ] Add an edit action for saved requests so I can correct request details without deleting and re-entering the whole record.
+- [ ] Continue refining the request form so it stays fast to fill out, searchable, and practical for real clinic use.
+
+---
+
 # Walkthrough Videos — John T.
 
 ## Sprint 3 (Java Module: Request Processing)
