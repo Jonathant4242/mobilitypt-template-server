@@ -4,7 +4,7 @@ A Django + SQLite clinic admin tool for tracking waitlist requests, organizing c
 
 ## Instructions for Build and Use
 
-[Software Demo](https://www.loom.com/share/6cc750bfc23d4e9b817e5b86dc3876a0)
+[Sprint4-Demo](https://www.loom.com/share/6cc750bfc23d4e9b817e5b86dc3876a0)
 
 ### Steps to build and/or run the software
 
